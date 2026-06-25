@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 st.set_page_config(page_title="Hibridación Eolica y H2", layout="wide")
 
 st.title("Trabajo Final Integrador - Mauro Galliani")
-st.title("Simulación planta Híbrida Eólica/Hidrógeno - Power-to-Gas")
-st.markdown("Simulador del balance entre Generación eólica, Producción de H2 y de CH4 y sus pérdidas.")
+st.title("Simulación de planta Híbrida Eólica/Hidrógeno - Power-to-Gas")
+st.markdown("Análisis del balance entre Generación Eólica y producción de Hidrógeno (H2) y Metano (CH4), contemplado sus pérdidas.")
 
 # Esquema conceptual generado con Graphviz (Nativo de Streamlit)
 with st.expander("Esquema conceptual de la Cadena Energética (Power-to-Gas)", expanded=False):
