@@ -116,7 +116,7 @@ with st.expander("Bases utilizadas para la estimación"):
     **Parámetros adoptados para la Electrólisis**
     * Eficiencia: **50 kWh/kg de $H_2$.** 
  
-    **Parámetros adoptados para la creación del Metano**
+    **Parámetros adoptados para la creación del Metano:**
     * **Ecuación química:** $4H_2 + CO_2 \\rightarrow CH_4 + 2H_2O$.
-    * En la metanación biológica, esta reacción es catalizada de forma natural por bacterias que habitan la roca de yacimientos vacíos, utilizando el $CO_2$ atrapado geológicamente.
+    En la metanación biológica, esta reacción es catalizada de forma natural por bacterias que habitan la roca de yacimientos vacíos, utilizando el $CO_2$ atrapado geológicamente.
     """)
