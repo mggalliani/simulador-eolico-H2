@@ -9,6 +9,37 @@ st.title("Trabajo Final Integrador - Mauro Galliani")
 st.title("Simulación planta Híbrida Eólica/Hidrógeno - Power-to-Gas")
 st.markdown("Simulador del balance entre Generación eólica, Producción de H2 y de CH4 y sus pérdidas.")
 
+# Esquema conceptual generado con Graphviz (Nativo de Streamlit)
+with st.expander("Ver Esquema Conceptual de la Cadena Energética (Power-to-Gas)", expanded=False):
+    st.graphviz_chart("""
+    digraph G {
+        rankdir=LR;
+        node [shape=rect, style=filled, fontname="Helvetica", fontsize=10, color="#555555"];
+        edge [fontname="Helvetica", fontsize=9, color="#555555"];
+
+        Viento [label="Viento 🌬️", fillcolor="#e0e0e0", shape=ellipse];
+        Parque [label="Parque Eólico ⚡", fillcolor="#bbdefb"];
+        SADI [label="Red Eléctrica (SADI) 🔌", fillcolor="#c8e6c9"];
+        Electrolizador [label="Electrolizador 💧", fillcolor="#bbdefb"];
+        Curtailment [label="Curtailment ❌", fillcolor="#ffcdd2"];
+        H2 [label="Hidrógeno (H2) 🎈", fillcolor="#e1bee7"];
+        Metanacion [label="Metanación 🔥/🦠\\n(Agrega CO2)", fillcolor="#ffe082"];
+        CH4 [label="Metano (CH4) 📦", fillcolor="#ffecb3"];
+        Uso [label="Red de Gasoductos 🏭", fillcolor="#cfd8dc", shape=ellipse];
+
+        Viento -> Parque;
+        Parque -> SADI [label=" 1. Prioridad (Red)"];
+        Parque -> Electrolizador [label=" 2. Excedentes (PtG)"];
+        Parque -> Curtailment [label=" 3. Pérdida"];
+        
+        Electrolizador -> H2 [label=" Consume Agua"];
+        H2 -> Uso [label=" Blending (H2 Puro)"];
+        H2 -> Metanacion;
+        Metanacion -> CH4;
+        CH4 -> Uso [label=" Inyección (Sintético)"];
+    }
+    """)
+
 # Controles en la barra lateral para mayor limpieza visual
 st.sidebar.header("Parámetros del Sistema")
 cap_red = st.sidebar.slider("Capacidad de la Red Eléctrica (MW)", 20, 100, 60)
@@ -88,7 +119,7 @@ col4.metric("Energía Perdida (Curtailment)", f"{energia_perdida:.1f} MWh", f"{p
 st.markdown("### Producción de Gas (Ciclo Químico)")
 
 if "Hidrógeno" in ruta_ptg:
-    st.info(f"**Ruta Activa:** Inyección directa o Blending. El gas conserva su estado puro.")
+    st.info(f"**Ruta elegida:** Inyección directa o Blending. El gas conserva su estado puro.")
     st.success(f"📦 Producción: **{produccion_kg_h2:.1f} kg de $H_2$** | 🎈 Volumen (0°C, 1atm): **{volumen_nm3_h2:.1f} $Nm^3$** | 💧 Demanda de Agua: **{consumo_agua_litros:.1f} L**")
 
 elif "Metano" in ruta_ptg:
@@ -98,11 +129,11 @@ elif "Metano" in ruta_ptg:
     demanda_kg_co2 = produccion_kg_h2 * 5.45
     
     if "Sabatier" in ruta_ptg:
-        st.warning(f"**Ruta Activa:** Reactor Sabatier. Requiere captura industrial de $CO_2$ y catalizadores metálicos (400°C).")
+        st.warning(f"**Ruta elegida:** Reactor Sabatier. Requiere captura industrial de $CO_2$ y catalizadores metálicos (400°C).")
         st.success(f"🔥 Metano Sintético (e-NG): **{produccion_kg_ch4:.1f} kg** | 🎈 Volumen: **{volumen_nm3_ch4:.1f} $Nm^3$ de $CH_4$**")
         st.error(f"☁️ Demanda de $CO_2$ Externo: **{demanda_kg_co2:.1f} kg** | 💧 Demanda de Agua: **{consumo_agua_litros:.1f} L**")
     else:
-        st.warning(f"**Ruta Activa:** Metanación Biológica (Caso Hychico). El proceso ocurre en el subsuelo mediante arqueas metanogénicas, consumiendo el $CO_2$ residual del yacimiento.")
+        st.warning(f"**Ruta elegida:** Metanación Biológica (Caso Hychico). El proceso ocurre en el subsuelo mediante arqueas metanogénicas, consumiendo el $CO_2$ residual del yacimiento.")
         st.success(f"🦠 Metano Biológico in-situ: **{produccion_kg_ch4:.1f} kg** | 🎈 Volumen: **{volumen_nm3_ch4:.1f} $Nm^3$ de $CH_4$**")
         st.info(f"⛰️ $CO_2$ Consumido del yacimiento: **{demanda_kg_co2:.1f} kg** | 💧 Demanda de Agua (superficie): **{consumo_agua_litros:.1f} L**")
 
@@ -113,10 +144,8 @@ with st.expander("Bases utilizadas para la estimación"):
     
     Orden de prioridad: Inyección a Red (prioridad 1) -> Electrólisis (excedentes) -> Curtailment (pérdida).
 
-    **Parámetros adoptados para la Electrólisis**
-    * Eficiencia: **50 kWh/kg de $H_2$.** 
- 
-    **Parámetros adoptados para la creación del Metano:**
+    **Parámetros adoptados para la Electrólisis:**
+    * Eficiencia: **50 kWh/kg de $H_2$.** **Parámetros adoptados para la creación del Metano:**
     * **Ecuación química:** $4H_2 + CO_2 \\rightarrow CH_4 + 2H_2O$.
     En la metanación biológica, esta reacción es catalizada de forma natural por bacterias que habitan la roca de yacimientos vacíos, utilizando el $CO_2$ atrapado geológicamente.
     """)
