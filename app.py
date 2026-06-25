@@ -10,7 +10,7 @@ st.title("Simulación planta Híbrida Eólica/Hidrógeno - Power-to-Gas")
 st.markdown("Simulador del balance entre Generación eólica, Producción de H2 y de CH4 y sus pérdidas.")
 
 # Esquema conceptual generado con Graphviz (Nativo de Streamlit)
-with st.expander("Ver Esquema Conceptual de la Cadena Energética (Power-to-Gas)", expanded=False):
+with st.expander("Esquema conceptual de la Cadena Energética (Power-to-Gas)", expanded=False):
     st.graphviz_chart("""
     digraph G {
         rankdir=LR;
