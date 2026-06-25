@@ -107,19 +107,16 @@ elif "Metano" in ruta_ptg:
         st.info(f"⛰️ $CO_2$ Consumido del yacimiento: **{demanda_kg_co2:.1f} kg** | 💧 Demanda de Agua (superficie): **{consumo_agua_litros:.1f} L**")
 
 # Memoria Técnica
-with st.expander("Bases de Cálculo y Metodología Paramétrica"):
+with st.expander("Bases utilizadas para la estimación"):
     st.markdown("""
-    **1. Algoritmo de Despacho (EMS)**
-    Orden de prelación: Inyección a Red (prioridad) -> Electrólisis (excedentes) -> Curtailment (pérdida).
+    **Algoritmo de despacho de energía (EMS):**
+    
+    Orden de prioridad: Inyección a Red (prioridad 1) -> Electrólisis (excedentes) -> Curtailment (pérdida).
 
-    **2. Parámetros de Electrólisis**
-    * Eficiencia: **50 kWh/kg** ($0.05 \text{ MWh/kg}$) de $H_2$.
-    * Densidad $H_2$: **$0.08988 \text{ kg/Nm}^3$**.
-    * Demanda Hídrica: Límite estequiométrico de $8.93 \text{ L/kg}$ penalizado por purgas del sistema de desmineralización.
-
-    **3. Termodinámica de la Metanación (Reacción de Sabatier)**
-    Ecuación química: $4H_2 + CO_2 \\rightarrow CH_4 + 2H_2O$.
-    * **Volumen:** Por conservación molar de los gases ideales, se requieren 4 volúmenes de Hidrógeno para producir 1 volumen de Metano ($Nm^3_{CH4} = Nm^3_{H2} / 4$). 
-    * **Masa:** 1 kg de $H_2$ requiere reaccionar estequiométricamente con 5.45 kg de Dióxido de Carbono ($CO_2$) para lograr producir aproximadamente 1.99 kg de Metano ($CH_4$).
-    * En el **Caso Hychico** (metanación biológica), esta reacción es catalizada de forma natural por bacterias que habitan la roca reservorio (yacimientos depletados), utilizando el $CO_2$ atrapado geológicamente, evitando la necesidad de instalar costosas plantas de captura de carbono en superficie.
+    **Parámetros adoptados para la Electrólisis**
+    * Eficiencia: **50 kWh/kg de $H_2$.** 
+ 
+    **Parámetros adoptados para la creación del Metano**
+    * **Ecuación química:** $4H_2 + CO_2 \\rightarrow CH_4 + 2H_2O$.
+    * En la metanación biológica, esta reacción es catalizada de forma natural por bacterias que habitan la roca de yacimientos vacíos, utilizando el $CO_2$ atrapado geológicamente.
     """)
