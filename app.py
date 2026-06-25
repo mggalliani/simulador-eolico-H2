@@ -6,9 +6,8 @@ import matplotlib.pyplot as plt
 st.set_page_config(page_title="Hibridación Eolica y H2", layout="wide")
 
 st.title("Trabajo Final Integrador - Mauro Galliani")
-st.title("Análisis de Hibridación Eólica con Hidrógeno verde")
-st.markdown("Simulador de balance entre Generación eólica, Producción de H2 y sus pérdidas.")
-st.markdown("(versión de prueba hasta definir objetivos del trabajo)")
+st.title("Simulación planta Híbrida Eólica/Hidrógeno - Powe-to-Gas")
+st.markdown("Simulador del balance entre Generación eólica, Producción de H2 y de CH4  y sus pérdidas.")
 
 # Controles en la barra lateral para mayor limpieza visual
 st.sidebar.header("Parámetros del Sistema")
@@ -76,7 +75,7 @@ pct_perdida = (energia_perdida / energia_viento) * 100
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Energía Eólica Total posible", f"{energia_viento:.1f} MWh")
 col2.metric("Inyección a Red", f"{energia_red:.1f} MWh", f"{pct_red:.1f}% del total", delta_color="off")
-col3.metric("Energía para Electrólisis", f"{energia_h2:.1f} MWh", f"{pct_h2:.1f}% del total", delta_color="off")
+col3.metric("Energía para Electrólisis - H2", f"{energia_h2:.1f} MWh", f"{pct_h2:.1f}% del total", delta_color="off")
 col4.metric("Energía Perdida (Curtailment)", f"{energia_perdida:.1f} MWh", f"{pct_perdida:.1f}% del total", delta_color="off")
 
 st.info(f"Producción estimada de Hidrógeno Verde: **{produccion_kg_h2:.1f} kg** (Asumiendo 50 kWh/kg)")
