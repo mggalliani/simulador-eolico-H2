@@ -116,7 +116,7 @@ col3.metric("Energía para Electrólisis - H2", f"{energia_h2:.1f} MWh", f"{pct_
 col4.metric("Energía Perdida (Curtailment)", f"{energia_perdida:.1f} MWh", f"{pct_perdida:.1f}% del total", delta_color="off")
 
 # Lógica condicional de la ruta química seleccionada
-st.markdown("### Producción de Gas (Ciclo Químico)")
+st.markdown("### Producción de Gas")
 
 if "Hidrógeno" in ruta_ptg:
     st.info(f"**Ruta elegida:** Inyección directa o Blending. El gas conserva su estado puro.")
