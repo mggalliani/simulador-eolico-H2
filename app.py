@@ -159,6 +159,7 @@ with st.expander("Bases utilizadas para la estimación"):
     * Eficiencia: **{eficiencia_h2:.1f} kWh/kg de $H_2$.** (Modificable desde el panel operativo).
     
     **Creación del Metano:**
+
     $4H_2 + CO_2 \\rightarrow CH_4 + 2H_2O$.
    
  En la metanación biológica, esta reacción es catalizada de forma natural por bacterias que habitan la roca de yacimientos vacíos, utilizando el $CO_2$ atrapado geológicamente. Existe la alternativa industrial que utiliza un proceso para generar la reacción química y obtener el Metano.
