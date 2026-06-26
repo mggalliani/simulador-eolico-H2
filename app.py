@@ -1,20 +1,15 @@
 import streamlit as st
 import numpy as np
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 # Configuración de la página
 st.set_page_config(page_title="Hibridación Eólica y H2", layout="wide")
-
-# Logo institucional en la barra lateral
-# Nota: Si el enlace web falla, guarda la imagen localmente como "logo_unahur.png" y cambia la URL por ese nombre.
-st.sidebar.image("https://unahur.edu.ar/wp-content/uploads/2019/11/logo-unahur.png", use_container_width=True)
-st.sidebar.markdown("---")
 
 st.title("Trabajo Final Integrador - Mauro Galliani")
 st.title("Simulación de planta Híbrida Eólica/Hidrógeno - Power-to-Gas")
 st.markdown("Análisis del balance entre Generación Eólica y producción de Hidrógeno (H2) y Metano (CH4), contemplado sus pérdidas.")
 
-# Esquema conceptual generado con Graphviz (Nativo de Streamlit)
+# Esquema conceptual generado con Graphviz
 with st.expander("Esquema conceptual de la Cadena Energética (Power-to-Gas)", expanded=False):
     st.graphviz_chart("""
     digraph G {
@@ -86,19 +81,42 @@ p_red = np.minimum(p_viento, cap_red)
 p_h2 = np.minimum(p_viento - p_red, cap_elec)
 p_perdida = p_viento - p_red - p_h2
 
-# Visualización de áreas
-fig, ax = plt.subplots(figsize=(12, 6))
-ax.fill_between(horas, 0, p_red, color='#4CAF50', label='Inyección a Red', alpha=0.8)
-ax.fill_between(horas, p_red, p_red + p_h2, color='#2196F3', label='Producción de H2', alpha=0.8)
-ax.fill_between(horas, p_red + p_h2, p_viento, color='#F44336', label='Curtailment (Pérdida)', alpha=0.8)
-ax.plot(horas, p_viento, color='black', linewidth=2, label='Generación Eólica Total')
-ax.set_xlabel('Horas del día')
-ax.set_ylabel('Potencia (MW)')
-ax.set_xlim(0, 24)
-ax.set_ylim(0, 130)
-ax.legend(loc='upper left')
-ax.grid(True, linestyle='--', alpha=0.5)
-st.pyplot(fig)
+# ---------------------------------------------------------
+# NUEVO GRÁFICO INTERACTIVO CON PLOTLY (El "Broche de Oro")
+# ---------------------------------------------------------
+fig = go.Figure()
+
+# Área 1: Red Eléctrica (Verde)
+fig.add_trace(go.Scatter(
+    x=horas, y=p_red, mode='lines', line=dict(width=0), 
+    fill='tozeroy', fillcolor='rgba(76, 175, 80, 0.8)', name='Inyección a Red'
+))
+# Área 2: Producción H2 (Azul)
+fig.add_trace(go.Scatter(
+    x=horas, y=p_red + p_h2, mode='lines', line=dict(width=0), 
+    fill='tonexty', fillcolor='rgba(33, 150, 243, 0.8)', name='Producción de H2'
+))
+# Área 3: Curtailment (Rojo)
+fig.add_trace(go.Scatter(
+    x=horas, y=p_red + p_h2 + p_perdida, mode='lines', line=dict(width=0), 
+    fill='tonexty', fillcolor='rgba(244, 67, 54, 0.8)', name='Curtailment (Pérdida)'
+))
+# Línea base: Viento Total (Negro)
+fig.add_trace(go.Scatter(
+    x=horas, y=p_viento, mode='lines', line=dict(color='black', width=3), 
+    name='Generación Eólica Total'
+))
+
+fig.update_layout(
+    title="Dinámica de Despacho Energético (24 Hs)",
+    xaxis_title="Horas del día",
+    yaxis_title="Potencia (MW)",
+    hovermode="x unified", # Muestra los datos de todas las curvas al pasar el mouse
+    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    margin=dict(l=0, r=0, t=50, b=0)
+)
+st.plotly_chart(fig, use_container_width=True)
+# ---------------------------------------------------------
 
 # Integración matemática (MWh)
 energia_viento = np.trapezoid(p_viento, horas)
@@ -106,16 +124,14 @@ energia_red = np.trapezoid(p_red, horas)
 energia_h2 = np.trapezoid(p_h2, horas)
 energia_perdida = np.trapezoid(p_perdida, horas)
 
-# Cálculos físicos base (Hidrógeno)
-# Convertimos la eficiencia de kWh/kg a MWh/kg dividiendo por 1000
+# Cálculos físicos base
 produccion_kg_h2 = energia_h2 / (eficiencia_h2 / 1000)  
 volumen_nm3_h2 = produccion_kg_h2 / 0.08988
 consumo_agua_litros = produccion_kg_h2 * factor_agua
 
-# 7. Visualización de los resultados numéricos en la interfaz
+# Visualización de los resultados numéricos en la interfaz
 st.markdown("### Resumen energético en las 24 Horas")
 
-# Cálculo de porcentajes sobre el total generado
 pct_red = (energia_red / energia_viento) * 100 if energia_viento > 0 else 0
 pct_h2 = (energia_h2 / energia_viento) * 100 if energia_viento > 0 else 0
 pct_perdida = (energia_perdida / energia_viento) * 100 if energia_viento > 0 else 0
@@ -132,9 +148,12 @@ st.markdown("### Producción de Gas")
 if "Hidrógeno" in ruta_ptg:
     st.info(f"**Ruta elegida:** Inyección directa o Blending. El gas conserva su estado puro.")
     st.success(f"📦 Producción: **{produccion_kg_h2:.1f} kg de $H_2$** | 🎈 Volumen (0°C, 1atm): **{volumen_nm3_h2:.1f} $Nm^3$** | 💧 Demanda de Agua: **{consumo_agua_litros:.1f} L**")
+    
+    # Impacto Tangible (Extra para la presentación)
+    km_equivalentes = produccion_kg_h2 * 100 # 1 kg rinde aprox 100km en un FCEV
+    st.caption(f"🌟 **Impacto Tangible:** Este hidrógeno permitiría recorrer **{km_equivalentes:,.0f} kilómetros** en un vehículo de celda de combustible (Cero Emisiones).")
 
 elif "Metano" in ruta_ptg:
-    # Cálculos de Sabatier: 4 moles H2 -> 1 mol CH4
     volumen_nm3_ch4 = volumen_nm3_h2 / 4
     produccion_kg_ch4 = produccion_kg_h2 * 1.989
     demanda_kg_co2 = produccion_kg_h2 * 5.45
@@ -156,11 +175,12 @@ with st.expander("Bases utilizadas para la estimación"):
     Orden de prioridad: Inyección a Red (prioridad 1) -> Electrólisis (excedentes) -> Curtailment (pérdida).
 
     **Parámetros adoptados para la Electrólisis y obtención de H2:**
-    * Eficiencia: **{eficiencia_h2:.1f} kWh/kg de $H_2$.** (Modificable desde el panel operativo).
+    * **Eficiencia:** **{eficiencia_h2:.1f} kWh/kg de $H_2$.** (Modificable desde el panel operativo).
+    * **Consumo Hídrico:** Límite termodinámico estequiométrico de 8.93 L/kg. El simulador adopta **{factor_agua:.1f} Litros de agua cruda/kg $H_2$** (Modificable), contemplando el rechazo por ósmosis inversa y purgas necesarias en la industria.
     
     **Creación del Metano:**
 
     $4H_2 + CO_2 \\rightarrow CH_4 + 2H_2O$.
    
- En la metanación biológica, esta reacción es catalizada de forma natural por bacterias que habitan la roca de yacimientos vacíos, utilizando el $CO_2$ atrapado geológicamente. Existe la alternativa industrial que utiliza un proceso para generar la reacción química y obtener el Metano.
+    En la metanación biológica, esta reacción es catalizada de forma natural por bacterias que habitan la roca de yacimientos vacíos, utilizando el $CO_2$ atrapado geológicamente. Existe la alternativa industrial que utiliza un proceso para generar la reacción química y obtener el Metano sintético.
     """)
