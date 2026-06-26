@@ -3,7 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Configuración de la página
-st.set_page_config(page_title="Hibridación Eolica y H2", layout="wide")
+st.set_page_config(page_title="Hibridación Eólica y H2", layout="wide")
+
+# Logo institucional en la barra lateral
+# Nota: Si el enlace web falla, guarda la imagen localmente como "logo_unahur.png" y cambia la URL por ese nombre.
+st.sidebar.image("https://unahur.edu.ar/wp-content/uploads/2019/11/logo-unahur.png", use_container_width=True)
+st.sidebar.markdown("---")
 
 st.title("Trabajo Final Integrador - Mauro Galliani")
 st.title("Simulación de planta Híbrida Eólica/Hidrógeno - Power-to-Gas")
@@ -54,6 +59,11 @@ ruta_ptg = st.sidebar.radio(
 )
 
 st.sidebar.header("Parámetros Operativos")
+eficiencia_h2 = st.sidebar.number_input(
+    "Eficiencia Electrólisis (kWh/kg)", min_value=30.0, max_value=80.0, value=50.0, step=1.0,
+    help="Consumo energético para producir 1 kg de H2. El estándar industrial actual ronda los 50 kWh/kg."
+)
+
 factor_agua = st.sidebar.number_input(
     "Consumo de Agua (L/kg H2)", min_value=8.93, max_value=30.0, value=15.0, step=0.5,
     help="Límite estequiométrico: 8.93 L/kg. Promedio industrial por purgas y ósmosis: 15 L/kg."
@@ -97,7 +107,8 @@ energia_h2 = np.trapezoid(p_h2, horas)
 energia_perdida = np.trapezoid(p_perdida, horas)
 
 # Cálculos físicos base (Hidrógeno)
-produccion_kg_h2 = energia_h2 / 0.05  # 50 kWh/kg
+# Convertimos la eficiencia de kWh/kg a MWh/kg dividiendo por 1000
+produccion_kg_h2 = energia_h2 / (eficiencia_h2 / 1000)  
 volumen_nm3_h2 = produccion_kg_h2 / 0.08988
 consumo_agua_litros = produccion_kg_h2 * factor_agua
 
@@ -139,13 +150,15 @@ elif "Metano" in ruta_ptg:
 
 # Memoria Técnica
 with st.expander("Bases utilizadas para la estimación"):
-    st.markdown("""
+    st.markdown(f"""
     **Algoritmo de despacho de energía (EMS):**
     
     Orden de prioridad: Inyección a Red (prioridad 1) -> Electrólisis (excedentes) -> Curtailment (pérdida).
 
     **Parámetros adoptados para la Electrólisis:**
-    * Eficiencia: **50 kWh/kg de $H_2$.** **Parámetros adoptados para la creación del Metano:**
+    * Eficiencia: **{eficiencia_h2:.1f} kWh/kg de $H_2$.** (Modificable desde el panel operativo).
+    
+    **Parámetros adoptados para la creación del Metano:**
     * **Ecuación química:** $4H_2 + CO_2 \\rightarrow CH_4 + 2H_2O$.
     En la metanación biológica, esta reacción es catalizada de forma natural por bacterias que habitan la roca de yacimientos vacíos, utilizando el $CO_2$ atrapado geológicamente.
     """)
