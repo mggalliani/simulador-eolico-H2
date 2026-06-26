@@ -176,8 +176,6 @@ with st.expander("Bases utilizadas para la estimación"):
 
     **Parámetros adoptados para los cálculos:**
 
-Los valores simulados son estimativos y en base a los cálculos teóricos que se utilizan en la industria.
-
     * **Eficiencia de Electrólisis:** **{eficiencia_h2:.1f} kWh/kg de $H_2$.** (Modificable desde el panel operativo).
     * **Consumo de agua:** Límite termodinámico estequiométrico de 8.93 L/kg. El simulador adopta **{factor_agua:.1f} Litros de agua cruda/kg $H_2$** (Modificable desde el panel operativo).
     
